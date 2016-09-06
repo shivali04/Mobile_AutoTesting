@@ -1,0 +1,316 @@
+package com.application.testing;
+
+import static org.junit.Assert.*;
+import junit.framework.Assert;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.Select;
+
+import io.selendroid.SelendroidCapabilities;
+import io.selendroid.SelendroidConfiguration;
+import io.selendroid.SelendroidDriver;
+import io.selendroid.SelendroidLauncher;
+
+
+public class JabongTesting
+{
+	private SelendroidLauncher selendroidServer = null;
+	private WebDriver driver = null;
+	private static final String USERNAME = "sshivali4@gmail.com";
+	private static final String PASSWORD = "selendroidtesting";
+	private static final String NEW_PASSWORD = "mobiletesting";
+	
+	@Test
+	public void testSignInOut() throws Exception
+	{
+		//Open URL
+		driver.get("http://m.jabong.com/");
+		Thread.sleep(5000);
+		
+		//Start login
+		driver.findElement(By.xpath("//*[@id='page_wrapper']/div[3]/div/section/ul/li[6]/a")).click();
+		Thread.sleep(5000);
+		
+		//Enter credentials
+		driver.findElement(By.xpath("//*[@id='MobLoginForm_email']")).sendKeys(USERNAME);
+		Thread.sleep(2000);
+		driver.findElement(By.xpath("//*[@id='MobLoginForm_password']")).sendKeys(PASSWORD);
+		Thread.sleep(2000);
+		
+		//Sign In
+		driver.findElement(By.className("orangebtn")).click();
+		Thread.sleep(2000);
+
+		//Check assert true for incorrect password input
+		WebElement errorMsg = driver.findElement(By.id("password_error"));
+		Assert.assertEquals(errorMsg.getText(),"Please Enter Valid Password");
+		
+		if(driver.findElement(By.id("password_error")).isDisplayed())
+		{
+			//Input new password
+			driver.findElement(By.xpath("//*[@id='MobLoginForm_password']")).sendKeys(NEW_PASSWORD);
+			Thread.sleep(2000);
+			
+			//Sign In
+			driver.findElement(By.className("orangebtn")).click();
+			Thread.sleep(2000);
+		}
+		
+		//Check assert true for sign in
+		WebElement loggedInUser = driver.findElement(By.xpath("//*[@id='page_wrapper']/div[3]/div/div[5]"));
+		Assert.assertEquals(loggedInUser.getText(),"MY ACCOUNT ( Welcome Shivali )");
+		
+		//Logout
+		driver.findElement(By.linkText("Logout")).click();
+		Thread.sleep(2000);
+		
+	}
+	
+	@Test
+	public void testSearchAddDeleteItems() throws Exception
+	{
+		//Open URL
+		driver.get("http://m.jabong.com/");
+		Thread.sleep(5000);
+				
+		//Start login
+		driver.findElement(By.xpath("//*[@id='page_wrapper']/div[3]/div/section/ul/li[6]/a")).click();
+		Thread.sleep(5000);
+				
+		//Login using credentials
+		driver.findElement(By.className("signup-wrp  ui-inputText")).sendKeys(USERNAME);
+		Thread.sleep(2000);
+		driver.findElement(By.xpath("//*[@id='MobLoginForm_password']")).sendKeys(PASSWORD);
+		Thread.sleep(2000);
+		
+		//Sign In
+		driver.findElement(By.className("orangebtn")).click();
+		Thread.sleep(2000);
+
+		//Check assert true for incorrect password input
+		WebElement errorMsg = driver.findElement(By.id("password_error"));
+		Assert.assertEquals(errorMsg.getText(),"Please Enter Valid Password");
+		
+		if(driver.findElement(By.id("password_error")).isDisplayed())
+		{
+			//Input new password
+			driver.findElement(By.xpath("//*[@id='MobLoginForm_password']")).sendKeys(NEW_PASSWORD);
+			Thread.sleep(2000);
+			
+			//Sign In
+			driver.findElement(By.className("orangebtn")).click();
+			Thread.sleep(2000);
+		}
+		
+		//Search for a specific brand
+		driver.findElement(By.id("searchInput")).sendKeys("allen Solly");
+		Thread.sleep(5000);
+		
+		//Click on search
+		driver.findElement(By.xpath("//*[@id='searchBtn']")).click();
+		Thread.sleep(2000);
+		
+		//Select product
+		driver.findElement(By.xpath("//*[@id='http://static14.jassets.com/p/Allen-Solly-Blue-Loafers-2024-3684021-1-related.jpg']/img")).click();
+		Thread.sleep(2000);
+		
+		//Select size from dropdown box
+		Select shoe_size_dropdown = new Select(driver.findElement(By.id("listProductSizes")));   
+		shoe_size_dropdown.selectByVisibleText("8");
+		Thread.sleep(2000);
+		
+		//Add product to cart
+		driver.findElement(By.linkText("ADD TO BAG")).click();
+		Thread.sleep(2000);
+		
+		//Check assert true for added item
+		WebElement checkAddedItem1 = driver.findElement(By.xpath("//*[@id='itemName_AL009SH36OIXINDFAS-3761391']"));
+		Assert.assertEquals(checkAddedItem1.getText(),"Blue Loafers");
+		Thread.sleep(2000);
+		
+		//Go Back to add another item
+		driver.findElement(By.xpath("//*[@id='page_wrapper']/header/a/span")).click();
+		Thread.sleep(2000);
+		
+		//Search for another brand
+		driver.findElement(By.id("searchInput")).sendKeys("peter england");
+		Thread.sleep(5000);
+		
+		//Select product
+		driver.findElement(By.xpath("//*[@id='http://static14.jassets.com/p/Peter-England-Khaki-Chinos-2210-5533421-1-related.jpg']/img")).click();
+		Thread.sleep(2000);
+		
+		//Select size from dropdown box
+		Select trouser_size_dropdown = new Select(driver.findElement(By.id("listProductSizes")));   
+		trouser_size_dropdown.selectByVisibleText("34");
+		Thread.sleep(2000);
+		
+		//Add this product to cart
+		driver.findElement(By.linkText("ADD TO BAG")).click();
+		Thread.sleep(2000);
+		
+		//Check assert true for 2nd item added
+		WebElement checkAddedItem2= driver.findElement(By.id("itemName_PE185MA44THJINDFAS-3922237"));
+		Assert.assertEquals(checkAddedItem2.getText(),"Khaki Chinos");
+		Thread.sleep(2000);
+
+		//Check assert true for total of both products
+		assertTrue(driver.getPageSource().contains("Rs.5498.00"));
+		
+		//Delete one item from cart
+		driver.findElement(By.xpath("//*[@id='cartItem_0']/div[2]/div/a[2]")).click();
+		Thread.sleep(2000);
+		
+		//Check assert true for deleted item by checking the total price after deleting the item
+		assertTrue(driver.getPageSource().contains("Rs.1499.00"));
+		
+	}
+	
+	@Test
+    public void testProfileUpdate() throws Exception
+    {
+        //Open URL
+        driver.get("http://m.jabong.com/");
+        Thread.sleep(5000);
+                
+        //Start Login
+        driver.findElement(By.xpath("//*[@id='page_wrapper']/div[3]/div/section/ul/li[6]/a")).click();
+        Thread.sleep(5000);
+                
+        //Login using credentials      
+        driver.findElement(By.xpath("//*[@id='MobLoginForm_email']")).sendKeys(USERNAME);
+        Thread.sleep(2000);
+        driver.findElement(By.xpath("//*[@id='MobLoginForm_password']")).sendKeys(PASSWORD);
+        Thread.sleep(2000);
+       
+        //Sign In
+        driver.findElement(By.className("orangebtn")).click();
+        Thread.sleep(2000);
+        
+        //Check assert true for incorrect password input
+      	WebElement errorMsg = driver.findElement(By.id("password_error"));
+      	Assert.assertEquals(errorMsg.getText(),"Please Enter Valid Password");
+      		
+      	if(driver.findElement(By.id("password_error")).isDisplayed())
+      	{
+      		//Input new password
+      		driver.findElement(By.xpath("//*[@id='MobLoginForm_password']")).sendKeys(NEW_PASSWORD);
+      		Thread.sleep(2000);
+      			
+      		//Sign In
+      		driver.findElement(By.className("orangebtn")).click();
+      		Thread.sleep(2000);
+      	}
+        
+        //Click on my profile
+        driver.findElement(By.linkText("My Profile")).click();
+        Thread.sleep(3000);
+        
+        //Click change password
+        driver.findElement(By.xpath("//*[@id='account-main']/div[1]/a")).click();
+        Thread.sleep(3000);
+        
+        //Enter new password
+        driver.findElement(By.xpath("//*[@id='PasswordForm_password']")).sendKeys(NEW_PASSWORD);;
+        Thread.sleep(3000);
+        
+        //Retype new password
+        driver.findElement(By.xpath("//*[@id='PasswordForm_password2']")).sendKeys("NEW_PASSWORD");;
+        Thread.sleep(3000);
+        
+        //Save password
+        driver.findElement(By.className("orangebtn")).click();
+        Thread.sleep(3000);
+        
+        //Check assert true for successful password change
+        WebElement loggedInUser = driver.findElement(By.xpath("//*[@id='qa-cart-update']/p"));
+        Assert.assertEquals(loggedInUser.getText(),"Changes successfully saved");
+        Thread.sleep(3000);
+        
+
+		// click on addresses 
+		//driver.findElement(By.xpath("//*[@id='account-main']/div[2]/a[2]")).click();
+		driver.findElement(By.linkText("Addresses")).click();
+		
+		Thread.sleep(2000);
+		
+		//click on edit address
+		//driver.findElement(By.xpath("//*[@id='account-main']/section[2]/ul/li[2]/a")).click();
+		driver.findElement(By.xpath("//a[contains(text(),'Edit')]")).click();
+		Thread.sleep(2000);
+		
+		//clear the city filed
+		driver.findElement(By.xpath("//*[@id='AddressForm_city']']")).clear();
+		
+		// enter new city field
+		driver.findElement(By.xpath("//*[@id='AddressForm_city']']")).sendKeys("baramati");
+		Thread.sleep(2000);
+		//clear region name
+		driver.findElement(By.xpath("//*[@id='AddressForm_regions_name']")).clear();
+		
+		//enter new region name
+		
+		driver.findElement(By.xpath("//*[@id='AddressForm_regions_name']")).sendKeys("maharashtra");
+		Thread.sleep(2000);
+		//clear first name
+		driver.findElement(By.xpath("//*[@id='AddressForm_first_name']")).clear();
+		
+		//enter new first name
+		driver.findElement(By.xpath("//input[@id='AddressForm_first_name']")).sendKeys("rohit");
+		Thread.sleep(2000);
+		//clear the last name field
+		driver.findElement(By.xpath("//*[@id='AddressForm_last_name']")).clear();
+		
+		//enter new last name
+		driver.findElement(By.xpath("//*[@id='AddressForm_last_name']")).sendKeys("jachak");
+		Thread.sleep(2000);
+		
+		// click save
+		
+				driver.findElement(By.className("orangebtn")).click();
+				Thread.sleep(3000);
+		
+		//assert true
+				WebElement savechanges = driver.findElement(By.xpath("//*[@id='qa-cart-update']/p"));
+				Assert.assertEquals(savechanges.getText(),"Changes successfully saved");
+				Thread.sleep(3000);
+		
+     }
+	
+	@Before
+	public void startSelendroidServer() throws Exception
+	{
+		if(selendroidServer != null)
+		{
+			selendroidServer.stopSelendroid();
+		}
+		SelendroidConfiguration config = new SelendroidConfiguration();
+		
+		selendroidServer = new SelendroidLauncher(config);
+		selendroidServer.lauchSelendroid();
+		
+		DesiredCapabilities caps = SelendroidCapabilities.android();
+		
+		driver = new SelendroidDriver(caps);
+		
+	}
+	
+	@After
+	public void stopSelendroidServer()
+	{
+		if(driver != null)
+		{
+			driver.quit();
+		}
+		if(selendroidServer != null)
+		{
+			selendroidServer.stopSelendroid();
+		}
+	}
+}
